@@ -20,8 +20,8 @@ class SystemTest extends FlatSpec with ShouldMatchers {
   it should "send a put to beanstalkd and receive an INSERTED reply" in { port =>
     val client = BeanstalkClient.build("localhost:"+port)
     val reply = client.put("hello", PutOpts()).get()
-    reply.getClass should be (classOf[Inserted])
-    reply.asInstanceOf[Inserted].id should be >= 0
+    val jobId = reply.right.get
+    jobId should be >= 0
   }
 
   it should "be able to reserve a job inserted by another client" in { port =>
@@ -31,14 +31,11 @@ class SystemTest extends FlatSpec with ShouldMatchers {
     val (putReply, reserveReply) =
       ((client1.put("hello", PutOpts())) join (client2.reserve())).get()
 
-    val insertedId = putReply.asInstanceOf[Inserted].id
+    val insertedId = putReply.right.get
+    val reservedJob = reserveReply.right.get
 
-    reserveReply.getClass should be (classOf[Reserved])
-    val reservedId = reserveReply.asInstanceOf[Reserved].id
-    val reservedData = reserveReply.asInstanceOf[Reserved].data
-
-    reservedId should be (insertedId)
-    new String(reservedData, charset) should be ("hello")
+    reservedJob.id should be (insertedId)
+    new String(reservedJob.data, charset) should be ("hello")
   }
 
   type FixtureParam = Int

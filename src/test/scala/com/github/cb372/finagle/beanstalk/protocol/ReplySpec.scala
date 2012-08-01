@@ -7,6 +7,7 @@ import com.twitter.naggati._
 import com.twitter.naggati.GoToStage
 import com.twitter.naggati.Emit
 import annotation.tailrec
+import java.util
 
 /**
   * Beanstalk protocol spec:
@@ -22,40 +23,20 @@ class ReplySpec extends FlatSpec with ShouldMatchers {
 
   behavior of "ReplyDecoder"
 
-  it should "produce an UnsupportedReplyError if it doesn't understand the server's reply" in {
-    val bytes = "OH MY GOD!!\r\n".getBytes(charset)
-    val emitted = readUntilEmit(bytes)
-    emitted should be (UnsupportedReply("OH MY GOD!!"))
-  }
+  /*
+   * One-line replies
+   */
 
   it should "decode INSERTED" in {
-    val bytes = "INSERTED 123\r\n".getBytes(charset)
-    val emitted = readUntilEmit(bytes)
-    emitted should be (Inserted(123))
+    checkDecode("INSERTED 123\r\n", Inserted(123))
   }
 
-  it should "decode BURIED" in {
-    val bytes = "BURIED 234\r\n".getBytes(charset)
-    val emitted = readUntilEmit(bytes)
-    emitted should be (Buried(234))
+  it should "decode BURIED without an ID" in {
+    checkDecode("BURIED\r\n", Buried)
   }
 
-  it should "decode EXPECTED_CRLF" in {
-    val bytes = "EXPECTED_CRLF\r\n".getBytes(charset)
-    val emitted = readUntilEmit(bytes)
-    emitted should be (ExpectedCrLf)
-  }
-
-  it should "decode JOB_TOO_BIG" in {
-    val bytes = "JOB_TOO_BIG\r\n".getBytes(charset)
-    val emitted = readUntilEmit(bytes)
-    emitted should be (JobTooBig)
-  }
-
-  it should "decode DRAINING" in {
-    val bytes = "DRAINING\r\n".getBytes(charset)
-    val emitted = readUntilEmit(bytes)
-    emitted should be (Draining)
+  it should "decode BURIED with an ID" in {
+    checkDecode("BURIED 234\r\n", Buried(234))
   }
 
   it should "decode USING" in {
@@ -72,16 +53,44 @@ class ReplySpec extends FlatSpec with ShouldMatchers {
   }
 
   it should "decode DEADLINE_SOON" in {
-    val bytes = "DEADLINE_SOON\r\n".getBytes(charset)
-    val emitted = readUntilEmit(bytes)
-    emitted should be (DeadlineSoon)
+    checkDecode("DEADLINE_SOON\r\n", DeadlineSoon)
   }
 
   it should "decode TIMED_OUT" in {
-    val bytes = "TIMED_OUT\r\n".getBytes(charset)
-    val emitted = readUntilEmit(bytes)
-    emitted should be (TimedOut)
+    checkDecode("TIMED_OUT\r\n", TimedOut)
   }
+
+  it should "decode RELEASED" in {
+    checkDecode("RELEASED\r\n", Released)
+  }
+
+  it should "decode TOUCHED" in {
+    checkDecode("TOUCHED\r\n", Touched)
+  }
+
+  it should "decode NOT_FOUND" in {
+    checkDecode("NOT_FOUND\r\n", NotFound)
+  }
+
+  it should "decode WATCHING" in {
+    checkDecode("WATCHING 100\r\n", Watching(100))
+  }
+
+  it should "decode NOT_IGNORED" in {
+    checkDecode("NOT_IGNORED\r\n", NotIgnored)
+  }
+
+  it should "decode KICKED" in {
+    checkDecode("KICKED 5\r\n", Kicked(5))
+  }
+
+  it should "decode PAUSED" in {
+    checkDecode("PAUSED\r\n", Paused)
+  }
+
+  /*
+   * Replies with data
+   */
 
   it should "decode RESERVED" in {
     val bytes = "RESERVED 1234 5\r\nabcde\r\n".getBytes(charset)
@@ -89,6 +98,74 @@ class ReplySpec extends FlatSpec with ShouldMatchers {
     emitted.getClass should be (classOf[Reserved])
     emitted.asInstanceOf[Reserved].id should be (1234)
     new String(emitted.asInstanceOf[Reserved].data, charset) should be ("abcde")
+  }
+
+
+  it should "decode multi-byte data" in {
+    val string = "あいう漢字"
+    val data = string.getBytes(charset)
+    val bytes = Array.concat(
+      ("RESERVED 1234 "+data.length+"\r\n").getBytes(charset),
+      data,
+      "\r\n".getBytes(charset)
+    )
+    val emitted = readUntilEmit(bytes)
+
+    emitted.getClass should be (classOf[Reserved])
+    emitted.asInstanceOf[Reserved].id should be (1234)
+    new String(emitted.asInstanceOf[Reserved].data, charset) should be (string)
+  }
+
+  it should "decode FOUND" in {
+    val bytes = "FOUND 2345 7\r\n   a   \r\n".getBytes(charset)
+    val emitted = readUntilEmit(bytes)
+    emitted.getClass should be (classOf[Found])
+    emitted.asInstanceOf[Found].id should be (2345)
+    new String(emitted.asInstanceOf[Found].data, charset) should be ("   a   ")
+  }
+
+  it should "decode OK" in {
+    val bytes = "OK 14\r\nsome yaml data\r\n".getBytes(charset)
+    val emitted = readUntilEmit(bytes)
+    emitted.getClass should be (classOf[Ok])
+    new String(emitted.asInstanceOf[Ok].data, charset) should be ("some yaml data")
+  }
+
+
+  /*
+  * Error replies
+  */
+
+  it should "decode EXPECTED_CRLF" in {
+    checkDecode("EXPECTED_CRLF\r\n", ExpectedCrLf)
+  }
+
+  it should "decode JOB_TOO_BIG" in {
+    checkDecode("JOB_TOO_BIG\r\n", JobTooBig)
+  }
+
+  it should "decode DRAINING" in {
+    checkDecode("DRAINING\r\n", Draining)
+  }
+
+  it should "decode OUT_OF_MEMORY" in {
+    checkDecode("OUT_OF_MEMORY\r\n", OutOfMemory)
+  }
+
+  it should "decode INTERNAL_ERROR" in {
+    checkDecode("INTERNAL_ERROR\r\n", InternalError)
+  }
+
+  it should "decode BAD_FORMAT" in {
+    checkDecode("BAD_FORMAT\r\n", BadFormat)
+  }
+
+  it should "decode UNKNOWN_COMMAND" in {
+    checkDecode("UNKNOWN_COMMAND\r\n", UnknownCommand)
+  }
+
+  it should "produce an UnsupportedReplyError if it doesn't understand the server's reply" in {
+    checkDecode("OH MY GOD!!\r\n", UnsupportedReply("OH MY GOD!!"))
   }
 
   def readUntilEmit(bytes: Array[Byte]): AnyRef = {
@@ -102,6 +179,12 @@ class ReplySpec extends FlatSpec with ShouldMatchers {
     case Emit(obj) => obj
     case GoToStage(stage) => readUntilEmit(buff, stage.apply(buff))
     case Incomplete => fail("Incomplete")
+  }
+
+  private def checkDecode(raw: String, expected: Reply) {
+    val bytes = raw.getBytes(charset)
+    val emitted = readUntilEmit(bytes)
+    emitted should be (expected)
   }
 
 }
