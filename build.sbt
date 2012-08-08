@@ -26,4 +26,12 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "1.7.2" % "test"
 
 scalacOptions += "-unchecked"
 
-publishTo := Some(Resolver.file("file",  new File( "../cb372.github.com/m2/releases" )) )
+//publishTo := Some(Resolver.file("file",  new File( "../cb372.github.com/m2/releases" )) )
+
+publishTo <<= version { (v: String) =>
+  val local = new File("../cb372.github.com/m2")
+  if (v.trim.endsWith("SNAPSHOT"))
+    Some(Resolver.file("snapshots", new File(local, "snapshots")))
+  else
+    Some(Resolver.file("releases", new File(local, "releases")))
+}
