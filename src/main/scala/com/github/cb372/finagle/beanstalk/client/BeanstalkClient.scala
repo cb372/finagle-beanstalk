@@ -237,14 +237,58 @@ class BeanstalkClient(service: BeanstalkService) {
   def stats(): Future[Either[Reply, String]] =
     service(Stats).map { reply => handleStatsReply(reply) }
 
-  /*
-   * TODO:
-   * list-tubes
-   * list-tube-used
-   * list-tubes-watched
-   * quit
-   * pause-tube
+  /**
+   * Retrieve a list of all tubes that currently exist.
+   * Note that tubes are created on-demand and disappear
+   * when they are not needed anymore (i.e. when they are empty
+   * and no clients are watching them).
+   * @return
    */
+  def listTubes(): Future[Either[Reply, String]] =
+    // TODO parse yaml reply
+    service(ListTubes).map { reply => handleStatsReply(reply) }
+
+  /**
+   * Get the name of the tube we are currently using
+   * @return
+   */
+  def listTubeUsed(): Future[Either[Reply, String]] =
+    service(ListTubeUsed).map { reply =>
+      reply match {
+        case Using(tube) => Right(tube)
+        case other => Left(other)
+      }
+    }
+
+  /**
+   * Retrieve a list of all tubes that we are watching.
+   * @return
+   */
+  def listTubesWatched(): Future[Either[Reply, String]] =
+    // TODO parse yaml reply
+    service(ListTubesWatched).map { reply => handleStatsReply(reply) }
+
+  /**
+   * Retrieve a list of all tubes that we are watching.
+   * @return
+   */
+  def quit(): Unit = {
+    // Do not bother sending the optional "quit" command, just close the connection
+    service.release()
+  }
+
+  /**
+   * Pause the given tube for the given number of seconds.
+   * @return true if the tube was paused, false if it was not found, error otherwise
+   */
+  def pauseTube(tube: String, delay: Int): Future[Either[Reply, Boolean]] =
+    service(PauseTube(tube, delay)).map { reply =>
+      reply match {
+        case Paused => Right(true)
+        case NotFound => Right(false)
+        case other => Left(other)
+      }
+    }
 
   private def handlePeekReply(reply: Reply): Option[Job[Array[Byte]]] =
     reply match {
