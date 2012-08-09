@@ -6,6 +6,7 @@ import com.twitter.naggati.{Codec => NaggatiCodec}
 import com.twitter.finagle.{Codec, CodecFactory, Service, ClientCodecConfig}
 import com.twitter.util.Future
 import com.twitter.util
+import yaml.{StoopidYamlParser, YamlParser}
 
 /**
  * Author: chris
@@ -51,7 +52,8 @@ case class Job[A](id: Int, data: A)
 
 import BeanstalkClient.BeanstalkService
 
-class BeanstalkClient(service: BeanstalkService) {
+class BeanstalkClient(service: BeanstalkService,
+                      yamlParser: YamlParser = new StoopidYamlParser) {
 
   /**
    * Insert the given string as a beanstalkd job
@@ -219,7 +221,7 @@ class BeanstalkClient(service: BeanstalkService) {
    * @param id job ID
    * @return stats data
    */
-  def statsJob(id: Int): Future[Either[Reply, String]] =
+  def statsJob(id: Int): Future[Either[Reply, Map[String, String]]] =
     service(StatsJob(id)).map { reply => handleStatsReply(reply) }
 
   /**
@@ -227,14 +229,14 @@ class BeanstalkClient(service: BeanstalkService) {
    * @param tube tube name
    * @return stats data
    */
-  def statsTube(tube: String): Future[Either[Reply, String]] =
+  def statsTube(tube: String): Future[Either[Reply, Map[String, String]]] =
     service(StatsTube(tube)).map { reply => handleStatsReply(reply) }
 
   /**
    * Retrieve stats about the beanstalkd server
    * @return stats data
    */
-  def stats(): Future[Either[Reply, String]] =
+  def stats(): Future[Either[Reply, Map[String, String]]] =
     service(Stats).map { reply => handleStatsReply(reply) }
 
   /**
@@ -244,9 +246,8 @@ class BeanstalkClient(service: BeanstalkService) {
    * and no clients are watching them).
    * @return
    */
-  def listTubes(): Future[Either[Reply, String]] =
-    // TODO parse yaml reply
-    service(ListTubes).map { reply => handleStatsReply(reply) }
+  def listTubes(): Future[Either[Reply, Seq[String]]] =
+    service(ListTubes).map { reply => handleYamlListReply(reply) }
 
   /**
    * Get the name of the tube we are currently using
@@ -264,9 +265,8 @@ class BeanstalkClient(service: BeanstalkService) {
    * Retrieve a list of all tubes that we are watching.
    * @return
    */
-  def listTubesWatched(): Future[Either[Reply, String]] =
-    // TODO parse yaml reply
-    service(ListTubesWatched).map { reply => handleStatsReply(reply) }
+  def listTubesWatched(): Future[Either[Reply, Seq[String]]] =
+    service(ListTubesWatched).map { reply => handleYamlListReply(reply) }
 
   /**
    * Retrieve a list of all tubes that we are watching.
@@ -296,10 +296,15 @@ class BeanstalkClient(service: BeanstalkService) {
       case other => None
     }
 
-  private def handleStatsReply(reply: Reply): Either[Reply, String] =
+  private def handleStatsReply(reply: Reply): Either[Reply, Map[String, String]] =
     reply match {
-      // TODO parse yaml to a Map[String, String]
-      case Ok(data) => Right(new String(data, BeanstalkCodec.CHARSET))
+      case Ok(data) => Right(yamlParser.parseMap(new String(data, BeanstalkCodec.CHARSET)))
+      case other => Left(other)
+    }
+
+  private def handleYamlListReply(reply: Reply): Either[Reply, Seq[String]] =
+    reply match {
+      case Ok(data) => Right(yamlParser.parseList(new String(data, BeanstalkCodec.CHARSET)))
       case other => Left(other)
     }
 }

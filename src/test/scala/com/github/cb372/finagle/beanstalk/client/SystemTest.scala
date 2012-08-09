@@ -38,6 +38,13 @@ class SystemTest extends FlatSpec with ShouldMatchers {
     new String(reservedJob.data, charset) should be ("hello")
   }
 
+//  it should "be able to retrieve stats" in { port =>
+//    val client = BeanstalkClient.build("localhost:"+port)
+//    val reply = client.stats().get()
+//    val stats = reply.right.get
+//    println(stats)
+//  }
+
   type FixtureParam = Int
 
   override def withFixture(test: OneArgTest) {
