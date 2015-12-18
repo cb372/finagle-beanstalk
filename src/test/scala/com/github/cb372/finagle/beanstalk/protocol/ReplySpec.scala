@@ -1,13 +1,10 @@
 package com.github.cb372.finagle.beanstalk.protocol
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+import com.github.cb372.finagle.beanstalk.naggati.{Incomplete, GoToStage, Emit, NextStep}
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
-import com.twitter.naggati._
-import com.twitter.naggati.GoToStage
-import com.twitter.naggati.Emit
-import annotation.tailrec
-import java.util
+import org.scalatest.{Matchers, FlatSpec}
+
+import scala.annotation.tailrec
 
 /**
   * Beanstalk protocol spec:
@@ -17,7 +14,7 @@ import java.util
   * Created: 7/30/12
   */
 
-class ReplySpec extends FlatSpec with ShouldMatchers {
+class ReplySpec extends FlatSpec with Matchers {
 
   val charset = "UTF-8"
 

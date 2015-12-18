@@ -1,6 +1,7 @@
 package com.github.cb372.finagle.beanstalk.protocol
 
-import com.twitter.naggati.{Stages, Encoder}
+import com.github.cb372.finagle.beanstalk.naggati.Stages
+import com.github.cb372.finagle.beanstalk.naggati.codec.BeanstalkCodec
 
 /**
  * Author: chris
@@ -104,7 +105,7 @@ object Replies {
 object ReplyDecoder {
   import BeanstalkCodec._
   import Replies._
-  import com.twitter.naggati.Stages._
+  import Stages._
 
   val decode = readLine(removeLF = true, encoding = CHARSET) { line =>
     line.split(TOKEN_DELIMITER).toList match {

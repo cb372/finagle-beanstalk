@@ -1,6 +1,7 @@
 package com.github.cb372.finagle.beanstalk.protocol
 
-import com.twitter.naggati.Encoder
+import com.github.cb372.finagle.beanstalk.naggati.Encoder
+import com.github.cb372.finagle.beanstalk.naggati.codec.BeanstalkCodec
 import org.jboss.netty.buffer.ChannelBuffer
 
 /**
