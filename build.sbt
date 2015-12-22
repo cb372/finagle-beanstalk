@@ -2,8 +2,6 @@ organization := "com.github.cb372"
 
 name := "finagle-beanstalk"
 
-ideaProjectName := "finagle-beanstalk"
-
 version := "0.0.1-SNAPSHOT"
 
 scalaVersion := "2.9.2"
