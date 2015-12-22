@@ -65,12 +65,13 @@ class SystemTest extends FlatSpec with ShouldMatchers {
   }
 
   private def startBeanstalkdServer(): Option[(Process, Int)] = {
+    val beanstalkdCmd = sys.env.getOrElse("BEANSTALKD", "beanstalkd")
     try {
-      val versionString = "beanstalkd -v".!!
+      val versionString = beanstalkdCmd + " -v".!!
       if (versionString.startsWith("beanstalkd")) {
         // looks OK, let's start the server on a random port
         val port = 11300 + Random.nextInt(1000)
-        val cmd = "beanstalkd -p " + port
+        val cmd = beanstalkdCmd + " -p " + port
         Some(cmd.run(), port)
       } else {
         println("Expected a beanstalkd version string but got: " + versionString)
