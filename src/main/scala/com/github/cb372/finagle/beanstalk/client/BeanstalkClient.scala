@@ -59,6 +59,19 @@ class BeanstalkClient(service: BeanstalkService,
                       yamlParser: YamlParser = new StoopidYamlParser) {
 
   /**
+    * Use the given tube for producing subsequent messages
+    *
+    * @param tube the tube where every subsequent put will put jobs into
+    * @return the tube's name
+    */
+  def use(tube: String): Future[Either[Reply, String]] = {
+    service(Use(tube)).map {
+      case Using(tubeName) => Right(tubeName)
+      case other => Left(other)
+    }
+  }
+
+  /**
     * Insert the given string as a beanstalkd job
     *
     * @param data the job
@@ -278,7 +291,7 @@ class BeanstalkClient(service: BeanstalkService,
     */
   def quit(): Unit = {
     // Do not bother sending the optional "quit" command, just close the connection
-    service.release()
+    service.close()
   }
 
   /**
