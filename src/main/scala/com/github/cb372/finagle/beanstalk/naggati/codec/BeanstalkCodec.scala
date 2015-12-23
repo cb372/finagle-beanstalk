@@ -1,6 +1,6 @@
-package com.github.cb372.finagle.beanstalk.protocol
+package com.github.cb372.finagle.beanstalk.naggati.codec
 
-import org.jboss.netty.buffer.{ChannelBuffers, ChannelBuffer}
+import org.jboss.netty.buffer.ChannelBuffers
 
 /**
  * Author: chris

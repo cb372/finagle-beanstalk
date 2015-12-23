@@ -1,18 +1,17 @@
 package com.github.cb372.finagle.beanstalk.client
 
-import org.scalatest.fixture.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
-import com.github.cb372.finagle.beanstalk.protocol.{Reserved, Inserted, Put}
+import com.twitter.util.Await
+import org.scalatest.{Matchers, Outcome, fixture}
 
-import sys.process._
-import util.Random
+import scala.sys.process._
+import scala.util.Random
 
 /**
  * Author: chris
  * Created: 7/29/12
  */
 
-class SystemTest extends FlatSpec with ShouldMatchers {
+class SystemTest extends fixture.FlatSpec with Matchers {
   val charset = "UTF-8"
 
   behavior of "beanstalk client"
@@ -29,7 +28,7 @@ class SystemTest extends FlatSpec with ShouldMatchers {
     val client2 = BeanstalkClient.build("localhost:"+port)
 
     val (putReply, reserveReply) =
-      ((client1.put("hello", PutOpts())) join (client2.reserve())).get()
+      Await.result(client1.put("hello", PutOpts()) join client2.reserve())
 
     val insertedId = putReply.right.get
     val reservedJob = reserveReply.right.get
@@ -47,38 +46,27 @@ class SystemTest extends FlatSpec with ShouldMatchers {
 
   type FixtureParam = Int
 
-  override def withFixture(test: OneArgTest) {
-    val server = startBeanstalkdServer()
-    server match {
-      case Some((proc, port)) => {
-        try {
-          test(port)
-        } finally {
-          // shutdown server
-          proc.destroy()
-        }
-      }
-      case _ => {
-        info("WARN: Skipping test because beanstalkd is not on the PATH")
-      }
+  override def withFixture(test: OneArgTest): Outcome = {
+    val (proc, port) = startBeanstalkdServer()
+
+    try {
+      test(port)
+    } finally {
+      // shutdown server
+      proc.destroy()
     }
   }
 
-  private def startBeanstalkdServer(): Option[(Process, Int)] = {
+  private def startBeanstalkdServer(): (Process, Int) = {
     val beanstalkdCmd = sys.env.getOrElse("BEANSTALKD", "beanstalkd")
-    try {
-      val versionString = beanstalkdCmd + " -v".!!
-      if (versionString.startsWith("beanstalkd")) {
-        // looks OK, let's start the server on a random port
-        val port = 11300 + Random.nextInt(1000)
-        val cmd = beanstalkdCmd + " -p " + port
-        Some(cmd.run(), port)
-      } else {
-        println("Expected a beanstalkd version string but got: " + versionString)
-        None
-      }
-    } catch {
-      case e: Throwable => None
+    val versionString = s"$beanstalkdCmd -v".!!
+    if (versionString.startsWith("beanstalkd")) {
+      // looks OK, let's start the server on a random port
+      val port = 11300 + Random.nextInt(1000)
+      val cmd = beanstalkdCmd + " -p " + port
+      (cmd.run(), port)
+    } else {
+      throw new IllegalArgumentException("Expected a beanstalkd version string but got: " + versionString)
     }
   }
 }
