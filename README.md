@@ -1,6 +1,6 @@
 # finagle-beanstalk
 
-[![Build Status](https://travis-ci.org/cb372/finagle-beanstalk.svg?branch=master)](https://travis-ci.org/cb372/finagle-beanstalk)
+[![Build Status](https://travis-ci.org/cb372/finagle-beanstalk.svg?branch=master)](https://travis-ci.org/cb372/finagle-beanstalk) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.cb372/finagle-beanstalk_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.cb372/finagle-beanstalk_2.11)
 
 An asynchronous Scala client for [beanstalkd](http://kr.github.io/beanstalkd/) built with [Finagle](https://twitter.github.io/finagle/).
 
