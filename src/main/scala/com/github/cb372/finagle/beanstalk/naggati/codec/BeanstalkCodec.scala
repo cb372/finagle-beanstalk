@@ -2,11 +2,6 @@ package com.github.cb372.finagle.beanstalk.naggati.codec
 
 import org.jboss.netty.buffer.ChannelBuffers
 
-/**
- * Author: chris
- * Created: 7/27/12
- */
-
 object BeanstalkCodec {
   val CHARSET = "UTF-8"
 

@@ -3,11 +3,6 @@ package com.github.cb372.finagle.beanstalk.protocol
 import com.github.cb372.finagle.beanstalk.naggati.Stages
 import com.github.cb372.finagle.beanstalk.naggati.codec.BeanstalkCodec
 
-/**
- * Author: chris
- * Created: 7/27/12
- */
-
 /** A reply from the server in response to a command */
 sealed trait Reply
 

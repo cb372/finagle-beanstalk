@@ -4,11 +4,6 @@ import com.github.cb372.finagle.beanstalk.naggati.Encoder
 import com.github.cb372.finagle.beanstalk.naggati.codec.BeanstalkCodec
 import org.jboss.netty.buffer.ChannelBuffer
 
-/**
- * Author: chris
- * Created: 7/27/12
- */
-
 sealed trait Command {
   def toChannelBuffer: ChannelBuffer
   def toByteArray: Array[Byte] = toChannelBuffer.array

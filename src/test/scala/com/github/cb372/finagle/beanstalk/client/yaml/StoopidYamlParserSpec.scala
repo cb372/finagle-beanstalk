@@ -3,11 +3,6 @@ package com.github.cb372.finagle.beanstalk.client.yaml
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
-/**
- * Author: chris
- * Created: 8/8/12
- */
-
 class StoopidYamlParserSpec extends FlatSpec with ShouldMatchers {
 
   behavior of "StoopidYamlParser"

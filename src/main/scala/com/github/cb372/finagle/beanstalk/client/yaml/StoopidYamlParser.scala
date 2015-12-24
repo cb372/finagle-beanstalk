@@ -2,11 +2,6 @@ package com.github.cb372.finagle.beanstalk.client.yaml
 
 import io.Source
 
-/**
- * Author: chris
- * Created: 8/8/12
- */
-
 class StoopidYamlParser extends YamlParser {
 
   private val keyValue = "([^:]+): (.*)".r

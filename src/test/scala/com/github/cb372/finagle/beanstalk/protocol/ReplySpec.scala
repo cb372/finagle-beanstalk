@@ -9,9 +9,6 @@ import scala.annotation.tailrec
 /**
   * Beanstalk protocol spec:
   * https://github.com/kr/beanstalkd/blob/master/doc/protocol.txt
-  *
-  * Author: chris
-  * Created: 7/30/12
   */
 
 class ReplySpec extends FlatSpec with Matchers {

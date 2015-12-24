@@ -9,11 +9,6 @@ import com.twitter.util.Future
 import com.twitter.util
 import yaml.{StoopidYamlParser, YamlParser}
 
-/**
- * Author: chris
- * Created: 7/29/12
- */
-
 object BeanstalkClient {
   type BeanstalkService = Service[Command, Reply]
 

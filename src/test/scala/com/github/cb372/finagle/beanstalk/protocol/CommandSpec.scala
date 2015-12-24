@@ -7,9 +7,6 @@ import java.io.ByteArrayOutputStream
 /**
  * Beanstalk protocol spec:
  * https://github.com/kr/beanstalkd/blob/master/doc/protocol.txt
- *
- * Author: chris
- * Created: 7/30/12
  */
 
 class CommandSpec extends FlatSpec with ShouldMatchers {

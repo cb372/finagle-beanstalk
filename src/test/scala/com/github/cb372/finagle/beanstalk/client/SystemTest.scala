@@ -6,11 +6,6 @@ import org.scalatest.{Matchers, Outcome, fixture}
 import scala.sys.process._
 import scala.util.Random
 
-/**
- * Author: chris
- * Created: 7/29/12
- */
-
 class SystemTest extends fixture.FlatSpec with Matchers {
   val charset = "UTF-8"
 
