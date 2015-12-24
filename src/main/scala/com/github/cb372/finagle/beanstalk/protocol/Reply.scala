@@ -3,11 +3,6 @@ package com.github.cb372.finagle.beanstalk.protocol
 import com.github.cb372.finagle.beanstalk.naggati.Stages
 import com.github.cb372.finagle.beanstalk.naggati.codec.BeanstalkCodec
 
-/**
- * Author: chris
- * Created: 7/27/12
- */
-
 /** A reply from the server in response to a command */
 sealed trait Reply
 
@@ -72,7 +67,6 @@ case object InternalError extends ErrorReply
 case object BadFormat extends ErrorReply
 
 case object UnknownCommand extends ErrorReply
-
 
 object Replies {
   val INSERTED = "INSERTED"
@@ -143,13 +137,13 @@ object ReplyDecoder {
         }
       }
       case FOUND :: id :: bytes :: _ => readBytes(bytes.trim.toInt) { bytes =>
-      // consume the newline after the data
+        // consume the newline after the data
         readBytes(2) { _ =>
           emit(Found(id.trim.toInt, bytes))
         }
       }
       case OK :: bytes :: _ => readBytes(bytes.trim.toInt) { bytes =>
-      // consume the newline after the data
+        // consume the newline after the data
         readBytes(2) { _ =>
           emit(Ok(bytes))
         }

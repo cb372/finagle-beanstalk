@@ -1,18 +1,15 @@
 package com.github.cb372.finagle.beanstalk.protocol
 
-import com.github.cb372.finagle.beanstalk.naggati.{Incomplete, GoToStage, Emit, NextStep}
-import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
-import org.scalatest.{Matchers, FlatSpec}
+import com.github.cb372.finagle.beanstalk.naggati.{ Incomplete, GoToStage, Emit, NextStep }
+import org.jboss.netty.buffer.{ ChannelBuffer, ChannelBuffers }
+import org.scalatest.{ Matchers, FlatSpec }
 
 import scala.annotation.tailrec
 
 /**
-  * Beanstalk protocol spec:
-  * https://github.com/kr/beanstalkd/blob/master/doc/protocol.txt
-  *
-  * Author: chris
-  * Created: 7/30/12
-  */
+ * Beanstalk protocol spec:
+ * https://github.com/kr/beanstalkd/blob/master/doc/protocol.txt
+ */
 
 class ReplySpec extends FlatSpec with Matchers {
 
@@ -44,9 +41,9 @@ class ReplySpec extends FlatSpec with Matchers {
      * but they may not begin with a hyphen.
      */
     val tubeName = "AZaz09-+/;.$_()"
-    val bytes = ("USING "+tubeName+"\r\n").getBytes(charset)
+    val bytes = ("USING " + tubeName + "\r\n").getBytes(charset)
     val emitted = readUntilEmit(bytes)
-    emitted should be (Using(tubeName))
+    emitted should be(Using(tubeName))
   }
 
   it should "decode DEADLINE_SOON" in {
@@ -92,42 +89,40 @@ class ReplySpec extends FlatSpec with Matchers {
   it should "decode RESERVED" in {
     val bytes = "RESERVED 1234 5\r\nabcde\r\n".getBytes(charset)
     val emitted = readUntilEmit(bytes)
-    emitted.getClass should be (classOf[Reserved])
-    emitted.asInstanceOf[Reserved].id should be (1234)
-    new String(emitted.asInstanceOf[Reserved].data, charset) should be ("abcde")
+    emitted.getClass should be(classOf[Reserved])
+    emitted.asInstanceOf[Reserved].id should be(1234)
+    new String(emitted.asInstanceOf[Reserved].data, charset) should be("abcde")
   }
-
 
   it should "decode multi-byte data" in {
     val string = "あいう漢字"
     val data = string.getBytes(charset)
     val bytes = Array.concat(
-      ("RESERVED 1234 "+data.length+"\r\n").getBytes(charset),
+      ("RESERVED 1234 " + data.length + "\r\n").getBytes(charset),
       data,
       "\r\n".getBytes(charset)
     )
     val emitted = readUntilEmit(bytes)
 
-    emitted.getClass should be (classOf[Reserved])
-    emitted.asInstanceOf[Reserved].id should be (1234)
-    new String(emitted.asInstanceOf[Reserved].data, charset) should be (string)
+    emitted.getClass should be(classOf[Reserved])
+    emitted.asInstanceOf[Reserved].id should be(1234)
+    new String(emitted.asInstanceOf[Reserved].data, charset) should be(string)
   }
 
   it should "decode FOUND" in {
     val bytes = "FOUND 2345 7\r\n   a   \r\n".getBytes(charset)
     val emitted = readUntilEmit(bytes)
-    emitted.getClass should be (classOf[Found])
-    emitted.asInstanceOf[Found].id should be (2345)
-    new String(emitted.asInstanceOf[Found].data, charset) should be ("   a   ")
+    emitted.getClass should be(classOf[Found])
+    emitted.asInstanceOf[Found].id should be(2345)
+    new String(emitted.asInstanceOf[Found].data, charset) should be("   a   ")
   }
 
   it should "decode OK" in {
     val bytes = "OK 14\r\nsome yaml data\r\n".getBytes(charset)
     val emitted = readUntilEmit(bytes)
-    emitted.getClass should be (classOf[Ok])
-    new String(emitted.asInstanceOf[Ok].data, charset) should be ("some yaml data")
+    emitted.getClass should be(classOf[Ok])
+    new String(emitted.asInstanceOf[Ok].data, charset) should be("some yaml data")
   }
-
 
   /*
   * Error replies
@@ -181,7 +176,7 @@ class ReplySpec extends FlatSpec with Matchers {
   private def checkDecode(raw: String, expected: Reply) {
     val bytes = raw.getBytes(charset)
     val emitted = readUntilEmit(bytes)
-    emitted should be (expected)
+    emitted should be(expected)
   }
 
 }

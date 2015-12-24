@@ -17,7 +17,7 @@
 package com.github.cb372.finagle.beanstalk.naggati
 
 import scala.annotation.tailrec
-import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
+import org.jboss.netty.buffer.{ ChannelBuffer, ChannelBuffers }
 import org.jboss.netty.channel._
 import org.jboss.netty.handler.codec.frame.FrameDecoder
 
@@ -83,7 +83,7 @@ object Codec {
 }
 
 object DontCareCounter extends (Int => Unit) {
-  def apply(x: Int) { }
+  def apply(x: Int) {}
 }
 
 /**
@@ -91,11 +91,10 @@ object DontCareCounter extends (Int => Unit) {
  * objects into byte arrays on the way out. Optionally, the bytes in/out are tracked.
  */
 class Codec[A: Manifest](
-  firstStage: Stage,
-  encoder: Encoder[A],
-  bytesReadCounter: Int => Unit,
-  bytesWrittenCounter: Int => Unit
-) extends FrameDecoder with ChannelDownstreamHandler {
+    firstStage: Stage,
+    encoder: Encoder[A],
+    bytesReadCounter: Int => Unit,
+    bytesWrittenCounter: Int => Unit) extends FrameDecoder with ChannelDownstreamHandler {
   def this(firstStage: Stage, encoder: Encoder[A]) =
     this(firstStage, encoder, DontCareCounter, DontCareCounter)
 

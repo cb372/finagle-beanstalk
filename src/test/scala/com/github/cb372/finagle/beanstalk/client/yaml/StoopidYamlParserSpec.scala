@@ -3,25 +3,20 @@ package com.github.cb372.finagle.beanstalk.client.yaml
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
-/**
- * Author: chris
- * Created: 8/8/12
- */
-
 class StoopidYamlParserSpec extends FlatSpec with ShouldMatchers {
 
   behavior of "StoopidYamlParser"
 
   it should "be able to parse a list of tubes" in {
     val parser = new StoopidYamlParser
-    parser.parseList(yamlTubeList) should be (Seq("default", "foo", "bar"))
+    parser.parseList(yamlTubeList) should be(Seq("default", "foo", "bar"))
   }
 
   it should "be able to parse stats as a map" in {
     val parser = new StoopidYamlParser
     val map = parser.parseMap(yamlStats)
 
-    map.size should be (46)
+    map.size should be(46)
     map("current-jobs-urgent") should be("0")
     map("max-job-size") should be("65535")
     map("version") should be("1.6+2+gecb403e")

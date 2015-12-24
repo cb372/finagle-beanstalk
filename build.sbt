@@ -1,8 +1,6 @@
 organization := "com.github.cb372"
 name := "finagle-beanstalk"
-version := "0.0.1-SNAPSHOT"
 scalaVersion := "2.11.7"
-resolvers += "Twitter Maven repo" at "http://maven.twttr.com/"
 
 libraryDependencies ++= Seq(
   "com.twitter"    %% "finagle-core"    % "6.31.0",
@@ -12,10 +10,38 @@ libraryDependencies ++= Seq(
 
 scalacOptions += "-unchecked"
 
-publishTo <<= version { (v: String) =>
-  val local = new File("../cb372.github.com/m2")
+scalariformSettings
+
+// Maven Central stuff
+pomExtra :=
+  <url>https://github.com/cb372/finagle-beanstalk</url>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>git@github.com:cb372/finagle-beanstalk.git</url>
+    <connection>scm:git:git@github.com:cb372/finagle-beanstalk.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>cb372</id>
+      <name>Chris Birchall</name>
+      <url>https://github.com/cb372</url>
+    </developer>
+  </developers>
+publishTo <<= version { v =>
+  val nexus = "https://oss.sonatype.org/"
   if (v.trim.endsWith("SNAPSHOT"))
-    Some(Resolver.file("snapshots", new File(local, "snapshots")))
+    Some("snapshots" at nexus + "content/repositories/snapshots")
   else
-    Some(Resolver.file("releases", new File(local, "releases")))
+    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
+publishMavenStyle := true
+publishArtifact in Test := false
+pomIncludeRepository := { _ => false }
+
+releasePublishArtifactsAction := PgpKeys.publishSigned.value

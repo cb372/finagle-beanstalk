@@ -7,9 +7,6 @@ import java.io.ByteArrayOutputStream
 /**
  * Beanstalk protocol spec:
  * https://github.com/kr/beanstalkd/blob/master/doc/protocol.txt
- *
- * Author: chris
- * Created: 7/30/12
  */
 
 class CommandSpec extends FlatSpec with ShouldMatchers {
@@ -55,7 +52,7 @@ class CommandSpec extends FlatSpec with ShouldMatchers {
     val cmd = Put(1, 2, 3, "abcd".getBytes(charset))
     val encoded = cmd.toByteArray
 
-    new String(encoded, charset) should be ("put 1 2 3 4\r\nabcd\r\n")
+    new String(encoded, charset) should be("put 1 2 3 4\r\nabcd\r\n")
   }
 
   behavior of "use"
@@ -66,7 +63,7 @@ class CommandSpec extends FlatSpec with ShouldMatchers {
     val cmd = Use(validTubeName)
     val encoded = cmd.toByteArray
 
-    new String(encoded, charset) should be ("use "+validTubeName+"\r\n")
+    new String(encoded, charset) should be("use " + validTubeName + "\r\n")
   }
 
   behavior of "reserve"
@@ -75,7 +72,7 @@ class CommandSpec extends FlatSpec with ShouldMatchers {
     val cmd = Reserve
     val encoded = cmd.toByteArray
 
-    new String(encoded, charset) should be ("reserve\r\n")
+    new String(encoded, charset) should be("reserve\r\n")
   }
 
   behavior of "reserve-with-timeout"
@@ -98,7 +95,7 @@ class CommandSpec extends FlatSpec with ShouldMatchers {
     val cmd = ReserveWithTimeout(5)
     val encoded = cmd.toByteArray
 
-    new String(encoded, charset) should be ("reserve-with-timeout 5\r\n")
+    new String(encoded, charset) should be("reserve-with-timeout 5\r\n")
   }
 
   behavior of "delete"
@@ -107,7 +104,7 @@ class CommandSpec extends FlatSpec with ShouldMatchers {
     val cmd = Delete(1234)
     val encoded = cmd.toByteArray
 
-    new String(encoded, charset) should be ("delete 1234\r\n")
+    new String(encoded, charset) should be("delete 1234\r\n")
   }
 
   behavior of "release"
@@ -128,7 +125,7 @@ class CommandSpec extends FlatSpec with ShouldMatchers {
     val cmd = Release(10, 20, 30)
     val encoded = cmd.toByteArray
 
-    new String(encoded, charset) should be ("release 10 20 30\r\n")
+    new String(encoded, charset) should be("release 10 20 30\r\n")
   }
 
   behavior of "bury"
@@ -143,14 +140,14 @@ class CommandSpec extends FlatSpec with ShouldMatchers {
     val cmd = Bury(10, 20)
     val encoded = cmd.toByteArray
 
-    new String(encoded, charset) should be ("bury 10 20\r\n")
+    new String(encoded, charset) should be("bury 10 20\r\n")
   }
 
   "touch" should "be encoded correctly" in {
     val cmd = Touch(10)
     val encoded = cmd.toByteArray
 
-    new String(encoded, charset) should be ("touch 10\r\n")
+    new String(encoded, charset) should be("touch 10\r\n")
   }
 
   behavior of "watch"
@@ -158,7 +155,7 @@ class CommandSpec extends FlatSpec with ShouldMatchers {
   itShouldValidateTubeName(Watch(_))
 
   it should "be encoded correctly" in {
-    new String(Watch(validTubeName).toByteArray, charset) should be ("watch "+validTubeName+"\r\n")
+    new String(Watch(validTubeName).toByteArray, charset) should be("watch " + validTubeName + "\r\n")
   }
 
   behavior of "ignore"
@@ -169,7 +166,7 @@ class CommandSpec extends FlatSpec with ShouldMatchers {
     val cmd = Ignore(validTubeName)
     val encoded = cmd.toByteArray
 
-    new String(encoded, charset) should be ("ignore "+validTubeName+"\r\n")
+    new String(encoded, charset) should be("ignore " + validTubeName + "\r\n")
   }
 
   "peek" should "be encoded correctly" in {
@@ -207,7 +204,7 @@ class CommandSpec extends FlatSpec with ShouldMatchers {
   behavior of "stats-tube"
 
   it should "be encoded correctly" in {
-    new String(StatsTube(validTubeName).toByteArray, charset) should be("stats-tube "+validTubeName+"\r\n")
+    new String(StatsTube(validTubeName).toByteArray, charset) should be("stats-tube " + validTubeName + "\r\n")
   }
 
   "stats" should "be encoded correctly" in {
@@ -241,9 +238,8 @@ class CommandSpec extends FlatSpec with ShouldMatchers {
   itShouldValidateTubeName(PauseTube(_, 5))
 
   it should "be encoded correctly" in {
-    new String(PauseTube(validTubeName, 5).toByteArray, charset) should be("pause-tube "+validTubeName+" 5\r\n")
+    new String(PauseTube(validTubeName, 5).toByteArray, charset) should be("pause-tube " + validTubeName + " 5\r\n")
   }
-
 
   private def itShouldValidateTubeName(cmdMaker: String => Command) {
 
