@@ -1,6 +1,5 @@
-
-resolvers += "sbt-idea-repo" at "http://mpeltonen.github.com/maven/"
-
-addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.6.0")
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.13.0")
 addSbtPlugin("com.typesafe.sbt" % "sbt-scalariform" % "1.3.0")
+addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.1")
+addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.8.3")
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "0.5.1")
