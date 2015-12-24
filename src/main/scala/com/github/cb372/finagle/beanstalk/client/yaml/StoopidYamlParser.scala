@@ -15,7 +15,7 @@ class StoopidYamlParser extends YamlParser {
   def parseMap(yaml: String): Map[String, String] = {
     val tuples: Seq[(String, String)] =
       Source.fromString(yaml).getLines().toList.collect {
-        case keyValue(groups@_*) => (groups(0) -> groups(1))
+        case keyValue(groups @ _*) => (groups(0) -> groups(1))
       }
     tuples.toMap
   }

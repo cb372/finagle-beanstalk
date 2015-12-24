@@ -18,3 +18,5 @@ publishTo <<= version { (v: String) =>
   else
     Some(Resolver.file("releases", new File(local, "releases")))
 }
+
+scalariformSettings

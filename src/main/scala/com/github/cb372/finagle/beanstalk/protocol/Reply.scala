@@ -68,7 +68,6 @@ case object BadFormat extends ErrorReply
 
 case object UnknownCommand extends ErrorReply
 
-
 object Replies {
   val INSERTED = "INSERTED"
   val BURIED = "BURIED"
@@ -138,13 +137,13 @@ object ReplyDecoder {
         }
       }
       case FOUND :: id :: bytes :: _ => readBytes(bytes.trim.toInt) { bytes =>
-      // consume the newline after the data
+        // consume the newline after the data
         readBytes(2) { _ =>
           emit(Found(id.trim.toInt, bytes))
         }
       }
       case OK :: bytes :: _ => readBytes(bytes.trim.toInt) { bytes =>
-      // consume the newline after the data
+        // consume the newline after the data
         readBytes(2) { _ =>
           emit(Ok(bytes))
         }
