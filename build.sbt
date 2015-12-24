@@ -2,7 +2,6 @@ organization := "com.github.cb372"
 name := "finagle-beanstalk"
 version := "0.0.1-SNAPSHOT"
 scalaVersion := "2.11.7"
-resolvers += "Twitter Maven repo" at "http://maven.twttr.com/"
 
 libraryDependencies ++= Seq(
   "com.twitter"    %% "finagle-core"    % "6.31.0",
